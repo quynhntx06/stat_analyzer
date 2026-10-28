@@ -90,7 +90,6 @@ int inp(const string& p, vector<st>& sts, vector<db>& scs, int& invalid, int& mi
     return 1;
 }
 
-//trung bình
 db Mean(const vector<db>& scs){
     if(scs.empty()) return 0.0;
     db sum = 0.0;
@@ -100,7 +99,6 @@ db Mean(const vector<db>& scs){
     return sum / scs.size();
 }
 
-//trung vị
 db Median(const vector<db>& scs){
     if(scs.empty()) return 0.0;
     vector<db> tmp = scs;
@@ -115,14 +113,6 @@ db Median(const vector<db>& scs){
         return (*x + tmp[mid]) / 2.0;
     }
 }
-/*
-Tạo một bản sao vector tmp = scs để không làm thay đổi thứ tự ban đầu của scs.
-Dùng thuật toán nth_element để phân vùng mảng sao cho phần tử tại vị trí mid = n / 2
-nằm đúng vị trí như khi đã sắp xếp (đạt độ phức tạp trung bình $O(N)$ nhanh hơn sort toàn bộ).
-Nếu $n$ lẻ: Trả về chính phần tử ở giữa tmp[mid].Nếu $n$ chẵn:
-Tìm giá trị lớn nhất trong nửa đầu mảng (từ đầu đến trước mid) bằng max_element,
-sau đó lấy trung bình cộng của giá trị đó và tmp[mid].
-*/
 
 pair<db, int> Mode(const vector<db>& scs){
     if(scs.empty()) return {0.0, 0};
@@ -142,7 +132,6 @@ pair<db, int> Mode(const vector<db>& scs){
     return {mode_val, max_fre};
 }
 
-//phương sai
 db Var(const vector<db>& scs, db mean){
     if(scs.size() <= 1) return 0.0;
     db sum = 0.0;
@@ -152,21 +141,16 @@ db Var(const vector<db>& scs, db mean){
     return sum / (scs.size() - 1);
 }
 
-//độ lệch chuẩn
 db stddev(double var){
     return sqrt(var);
 }
 
-//ước lươgnj khoảng tin cậy 
-//margin = 1.96 * s / căn n
-//khoảng: [mean - margin; mean + margin]
 pair<db, db> estimate(db mean, db std_dev, int n){
     if(n == 0) return {0.0, 0.0};
     db margin = 1.96 * (std_dev / sqrt(db(n)));
     return {mean - margin, mean + margin};
 }
 
-//z = (x - mean) / độ lệch chuẩn
 void Outliers(const vector<st>& sts, db mean, db std_dev, db t = 2.0){
     cout << "\n---------------- OUTLIER DETECTION (|z| >= " << t << ") ----------------\n";
     if(std_dev == 0.0){
