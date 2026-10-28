@@ -18,8 +18,9 @@ A command-line tool written in C++17 that parses a CSV file of student scores, c
 
 ```bash
 g++ -std=c++17 -O2 main.cpp -o analyzer
-./analyzer                 # reads data.csv by default
+./analyzer
 ./analyzer path/to/file.csv
+```
 On Windows PowerShell, run `.\analyzer.exe` instead of `./analyzer`.
 
 ## Benchmark
@@ -50,8 +51,10 @@ g++ -O2 -std=c++17 bench.cpp -o bench
 
 ## Project Structure
 
+```
 .
-├── main.cpp      # CLI analytics engine
-├── bench.cpp     # Benchmark for nth_element vs sort
-├── data.csv      # Sample test dataset
+├── main.cpp
+├── bench.cpp
+├── data.csv
 └── README.md
+```
