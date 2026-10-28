@@ -29,9 +29,10 @@ int main(){
             size_t mid = N / 2;
             nth_element(b.begin(), b.begin() + mid, b.end());
             double med_nth = 0;
-            if (N % 2 == 1) {
+            if(N % 2 == 1){
                 med_nth = b[mid];
-            } else {
+            }
+            else{
                 auto x = max_element(b.begin(), b.begin() + mid);
                 med_nth = (*x + b[mid]) / 2.0;
             }
