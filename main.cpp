@@ -18,6 +18,22 @@ struct student{
 
 using st = student;
 
+vector<string> splitCSV(const string& line){
+    vector<string> f;
+    string cur;
+    bool q = false;
+    for(char c : line){
+        if(c == '"') q = !q;
+        else if(c == ',' && !q){
+            f.push_back(cur);
+            cur.clear();
+        }
+        else if(c != '\r') cur += c;
+    }
+    f.push_back(cur);
+    return f;
+}
+
 int inp(const string& p, vector<st>& sts, vector<db>& scs, int& invalid, int& miss){
     ifstream in(p);
     if(!in.is_open()){
@@ -29,11 +45,12 @@ int inp(const string& p, vector<st>& sts, vector<db>& scs, int& invalid, int& mi
         if(l.empty()){
             continue;
         }
-        stringstream ss(l);
-        string id, name, s;
-        getline(ss, id, ',');
-        getline(ss, name, ',');
-        getline(ss, s, ',');
+        vector<string> f = splitCSV(l);
+        if(f.size() != 3){
+            invalid++;
+            continue;
+        }
+        string id = f[0], name = f[1], s = f[2];
         if(id.empty() || name.empty()){
             invalid++;
             continue;
@@ -43,6 +60,7 @@ int inp(const string& p, vector<st>& sts, vector<db>& scs, int& invalid, int& mi
             miss++;
             continue;
         }
+        replace(s.begin(), s.end(), ',', '.');   // 8,5 -> 8.5
         db score;
         try{
             size_t pos;
@@ -72,6 +90,7 @@ int inp(const string& p, vector<st>& sts, vector<db>& scs, int& invalid, int& mi
     return 1;
 }
 
+//trung bình
 db Mean(const vector<db>& scs){
     if(scs.empty()) return 0.0;
     db sum = 0.0;
@@ -81,6 +100,7 @@ db Mean(const vector<db>& scs){
     return sum / scs.size();
 }
 
+//trung vị
 db Median(const vector<db>& scs){
     if(scs.empty()) return 0.0;
     vector<db> tmp = scs;
@@ -95,6 +115,14 @@ db Median(const vector<db>& scs){
         return (*x + tmp[mid]) / 2.0;
     }
 }
+/*
+Tạo một bản sao vector tmp = scs để không làm thay đổi thứ tự ban đầu của scs.
+Dùng thuật toán nth_element để phân vùng mảng sao cho phần tử tại vị trí mid = n / 2
+nằm đúng vị trí như khi đã sắp xếp (đạt độ phức tạp trung bình $O(N)$ nhanh hơn sort toàn bộ).
+Nếu $n$ lẻ: Trả về chính phần tử ở giữa tmp[mid].Nếu $n$ chẵn:
+Tìm giá trị lớn nhất trong nửa đầu mảng (từ đầu đến trước mid) bằng max_element,
+sau đó lấy trung bình cộng của giá trị đó và tmp[mid].
+*/
 
 pair<db, int> Mode(const vector<db>& scs){
     if(scs.empty()) return {0.0, 0};
@@ -114,6 +142,7 @@ pair<db, int> Mode(const vector<db>& scs){
     return {mode_val, max_fre};
 }
 
+//phương sai
 db Var(const vector<db>& scs, db mean){
     if(scs.size() <= 1) return 0.0;
     db sum = 0.0;
@@ -123,16 +152,21 @@ db Var(const vector<db>& scs, db mean){
     return sum / (scs.size() - 1);
 }
 
+//độ lệch chuẩn
 db stddev(double var){
     return sqrt(var);
 }
 
+//ước lươgnj khoảng tin cậy 
+//margin = 1.96 * s / căn n
+//khoảng: [mean - margin; mean + margin]
 pair<db, db> estimate(db mean, db std_dev, int n){
     if(n == 0) return {0.0, 0.0};
     db margin = 1.96 * (std_dev / sqrt(db(n)));
     return {mean - margin, mean + margin};
 }
 
+//z = (x - mean) / độ lệch chuẩn
 void Outliers(const vector<st>& sts, db mean, db std_dev, db t = 2.0){
     cout << "\n---------------- OUTLIER DETECTION (|z| >= " << t << ") ----------------\n";
     if(std_dev == 0.0){
@@ -173,7 +207,7 @@ void outp(const vector<st>& sts, const vector<db>& scs, int invalid, int miss){
     cout << "\n=======================================================\n";
     cout << "              STATISTICAL SUMMARY REPORT               \n";
     cout << "=======================================================\n";
-    cout << "Total records (n): " << n + invalid << "\n";
+    cout << "Total rows: " << n + invalid << "\n";
     cout << "Valid records          : " << n << "\n";
     cout << "Invalid records        : " << invalid << "\n";
     cout << "Missing score records  : " << miss << "\n";
